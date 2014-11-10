@@ -1,0 +1,8 @@
+<div class="articles">
+<% @articles.each do |article| %>
+    <h2><%= article.title %></h2>
+    <p><%= article.text %></p>
+    <% if article != @articles.last %><hr /><% end %>
+<% end %>
+</div>
+<%= link_to 'New Article', new_article_path %>
