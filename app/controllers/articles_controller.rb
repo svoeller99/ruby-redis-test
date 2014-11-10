@@ -1,10 +1,11 @@
 class ArticlesController < ApplicationController
+  #before_filter :find_article
+
   def new
     @article = Article.new
   end
 
   def create
-    #render plain: params[:article].inspect
     @article = Article.new(article_params)
 
     if @article.save
@@ -15,11 +16,13 @@ class ArticlesController < ApplicationController
   end
 
   def edit
-    @article = Article.find(params[:id])
+    @article = find_article(params)
+    #Article.find(params[:id])
   end
 
   def update
-    @article = Article.find(params[:id])
+    @article = find_article(params)
+    #Article.find(params[:id])
 
     if @article.update(article_params)
       redirect_to @article
@@ -29,7 +32,8 @@ class ArticlesController < ApplicationController
   end
 
   def destroy
-    @article = Article.find(params[:id])
+    @article = find_article(params)
+    #Article.find(params[:id])
 
     @article.destroy
 
@@ -37,15 +41,28 @@ class ArticlesController < ApplicationController
   end
 
   def show
-    @article = Article.find(params[:id])
+    @article = find_article(params)
+    #Article.find(params[:id])
   end
 
   def index
     @articles = Article.all
   end
 
+  protected
+  def find_article(params)
+    if id = Slug[params[:id]]
+      @article = Article.find(id)
+    else
+      @article = Article.find(params[:id])
+    end
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_path
+    return nil
+  end
+
   private
   def article_params
-    params.require(:article).permit(:title, :text)
+    params.require(:article).permit(:title, :text, :slug)
   end
 end
